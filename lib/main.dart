@@ -30,9 +30,8 @@ class _NightOwlHomeState extends State<NightOwlHome> {
   Timer? timer;
   List<String> laps = [];
 
-  // Start timer
   void startTimer() {
-    if (timer != null && timer!.isActive) return; // Already running
+    if (timer != null && timer!.isActive) return;
     timer = Timer.periodic(const Duration(seconds: 1), (_) {
       setState(() {
         seconds++;
@@ -40,12 +39,10 @@ class _NightOwlHomeState extends State<NightOwlHome> {
     });
   }
 
-  // Stop timer
   void stopTimer() {
     timer?.cancel();
   }
 
-  // Reset timer
   void resetTimer() {
     timer?.cancel();
     setState(() {
@@ -54,25 +51,26 @@ class _NightOwlHomeState extends State<NightOwlHome> {
     });
   }
 
-  // Add lap
   void addLap() {
     final minutes = seconds ~/ 60;
     final secs = seconds % 60;
     final hours = minutes ~/ 60;
     final displayMinutes = minutes % 60;
+
     final lapTime =
         "${hours.toString().padLeft(2, '0')}:${displayMinutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}";
+
     setState(() {
       laps.insert(0, lapTime);
     });
   }
 
-  // Format timer display
   String get timerText {
     final minutes = seconds ~/ 60;
     final secs = seconds % 60;
     final hours = minutes ~/ 60;
     final displayMinutes = minutes % 60;
+
     return "${hours.toString().padLeft(2, '0')}:${displayMinutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}";
   }
 
@@ -81,7 +79,6 @@ class _NightOwlHomeState extends State<NightOwlHome> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background image
           Positioned.fill(
             child: Image.asset(
               'assets/img.jpg',
@@ -89,11 +86,11 @@ class _NightOwlHomeState extends State<NightOwlHome> {
             ),
           ),
 
-          // Timer + Buttons
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Timer Text
+              const SizedBox(height: 80), // 👈 moves timer DOWN safely
+
               Text(
                 timerText,
                 style: const TextStyle(
@@ -109,17 +106,17 @@ class _NightOwlHomeState extends State<NightOwlHome> {
                   ],
                 ),
               ),
+
               const SizedBox(height: 30),
 
-              // Buttons Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Start Button
                   ElevatedButton(
                     onPressed: startTimer,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.tealAccent.shade700,
+                      backgroundColor: const Color(0xFFD8F3DC),
+                      foregroundColor: Colors.black, // 👈 text color
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -130,11 +127,11 @@ class _NightOwlHomeState extends State<NightOwlHome> {
                   ),
                   const SizedBox(width: 15),
 
-                  // Stop Button
                   ElevatedButton(
                     onPressed: stopTimer,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
+                      backgroundColor: const Color(0xFFFFE5D9),
+                      foregroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -145,11 +142,11 @@ class _NightOwlHomeState extends State<NightOwlHome> {
                   ),
                   const SizedBox(width: 15),
 
-                  // Lap Button
                   ElevatedButton(
                     onPressed: addLap,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orangeAccent,
+                      backgroundColor: const Color(0xFFFFF1C1),
+                      foregroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -160,11 +157,11 @@ class _NightOwlHomeState extends State<NightOwlHome> {
                   ),
                   const SizedBox(width: 15),
 
-                  // Reset Button
                   ElevatedButton(
                     onPressed: resetTimer,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade800,
+                      backgroundColor: const Color(0xFFEDEDE9),
+                      foregroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -175,9 +172,9 @@ class _NightOwlHomeState extends State<NightOwlHome> {
                   ),
                 ],
               ),
+
               const SizedBox(height: 30),
 
-              // Lap List
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
