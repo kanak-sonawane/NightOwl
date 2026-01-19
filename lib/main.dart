@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/timer_screen.dart';
 import 'screens/background_screen.dart';
 
@@ -18,7 +19,8 @@ class NightOwlApp extends StatelessWidget {
   }
 }
 
-/* ---------------- HOME WRAPPER WITH BOTTOM NAV ---------------- */
+/* ---------------- HOME WRAPPER ---------------- */
+
 class HomeWrapper extends StatefulWidget {
   const HomeWrapper({super.key});
 
@@ -30,7 +32,29 @@ class _HomeWrapperState extends State<HomeWrapper> {
   int selectedIndex = 0;
   String selectedBackground = 'assets/backgrounds/img.jpg';
 
-  void updateBackground(String bg) {
+  @override
+  void initState() {
+    super.initState();
+    loadSavedBackground();
+  }
+
+  // LOAD saved background
+  Future<void> loadSavedBackground() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedBg = prefs.getString('selected_bg');
+
+    if (savedBg != null) {
+      setState(() {
+        selectedBackground = savedBg;
+      });
+    }
+  }
+
+  // SAVE background
+  Future<void> updateBackground(String bg) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selected_bg', bg);
+
     setState(() {
       selectedBackground = bg;
     });
