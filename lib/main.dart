@@ -19,8 +19,6 @@ class NightOwlApp extends StatelessWidget {
   }
 }
 
-/* ---------------- HOME WRAPPER ---------------- */
-
 class HomeWrapper extends StatefulWidget {
   const HomeWrapper({super.key});
 
@@ -30,43 +28,66 @@ class HomeWrapper extends StatefulWidget {
 
 class _HomeWrapperState extends State<HomeWrapper> {
   int selectedIndex = 0;
-  String selectedBackground = 'assets/backgrounds/img.jpg';
+
+  String assetBg = 'assets/backgrounds/img.jpg'; // Initialize with default
+  String? fileBgPath;
+  bool isLoading = true; // Add loading flag
 
   @override
   void initState() {
     super.initState();
-    loadSavedBackground();
+    loadBackground();
   }
 
-  // LOAD saved background
-  Future<void> loadSavedBackground() async {
+  Future<void> loadBackground() async {
     final prefs = await SharedPreferences.getInstance();
-    final savedBg = prefs.getString('selected_bg');
-
-    if (savedBg != null) {
-      setState(() {
-        selectedBackground = savedBg;
-      });
-    }
+    setState(() {
+      assetBg = prefs.getString('asset_bg') ?? 'assets/backgrounds/img.jpg';
+      fileBgPath = prefs.getString('file_bg');
+      isLoading = false; // Done loading
+    });
   }
 
-  // SAVE background
-  Future<void> updateBackground(String bg) async {
+  Future<void> setAssetBg(String bg) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selected_bg', bg);
+    await prefs.setString('asset_bg', bg);
+    await prefs.remove('file_bg'); // IMPORTANT
 
     setState(() {
-      selectedBackground = bg;
+      assetBg = bg;
+      fileBgPath = null;
+    });
+  }
+
+  Future<void> setFileBg(String path) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('file_bg', path);
+
+    setState(() {
+      fileBgPath = path;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    // Show loading while preferences are being loaded
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     final screens = [
-      TimerScreen(background: selectedBackground),
+      TimerScreen(
+        assetBg: assetBg,
+        fileBgPath: fileBgPath,
+      ),
       BackgroundScreen(
-        currentBg: selectedBackground,
-        onSelect: updateBackground,
+        currentAssetBg: assetBg,
+        onAssetSelect: setAssetBg,
+        onFileSelect: setFileBg,
       ),
     ];
 
@@ -74,10 +95,7 @@ class _HomeWrapperState extends State<HomeWrapper> {
       body: screens[selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
-        onTap: (index) => setState(() => selectedIndex = index),
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: const Color(0xFFF8F9FA),
+        onTap: (i) => setState(() => selectedIndex = i),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.timer), label: 'Timer'),
           BottomNavigationBarItem(icon: Icon(Icons.image), label: 'Backgrounds'),
